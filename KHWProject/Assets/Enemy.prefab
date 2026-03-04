@@ -62,7 +62,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8823145779398171328, guid: 0359c7746491e7e4a889255dfd046976, type: 3}
       propertyPath: m_Name
-      value: EnhancedShell Variant
+      value: Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 8823145779398171328, guid: 0359c7746491e7e4a889255dfd046976, type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 6968096558045506402, guid: 0359c7746491e7e4a889255dfd046976, type: 3}
@@ -71,33 +75,19 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8823145779398171328, guid: 0359c7746491e7e4a889255dfd046976, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -2467897530168198362}
-    - targetCorrespondingSourceObject: {fileID: 8823145779398171328, guid: 0359c7746491e7e4a889255dfd046976, type: 3}
-      insertIndex: -1
       addedObject: {fileID: -5464080646045911465}
     - targetCorrespondingSourceObject: {fileID: 8823145779398171328, guid: 0359c7746491e7e4a889255dfd046976, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5054698605873492367}
+    - targetCorrespondingSourceObject: {fileID: 8823145779398171328, guid: 0359c7746491e7e4a889255dfd046976, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -950029176940920144}
   m_SourcePrefab: {fileID: 100100000, guid: 0359c7746491e7e4a889255dfd046976, type: 3}
 --- !u!1 &3340661718531549086 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8823145779398171328, guid: 0359c7746491e7e4a889255dfd046976, type: 3}
   m_PrefabInstance: {fileID: 6065915992885853534}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &-2467897530168198362
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3340661718531549086}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 60b25a46dd2e3184a84e6c0339b831f1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Projectile
-  speed: 5
-  lifeTime: 10
 --- !u!54 &-5464080646045911465
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -148,3 +138,16 @@ CapsuleCollider:
   m_Height: 1.6
   m_Direction: 2
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-950029176940920144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3340661718531549086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81739a781b0a3854d98b6350c4c713f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyProjectile
+  speed: 15

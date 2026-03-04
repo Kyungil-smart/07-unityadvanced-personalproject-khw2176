@@ -8,14 +8,14 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Obstacle
   - Water
   - UI
-  - 
-  - 
-  - Ground
-  - Players
-  - PostProcessing
+  - Player
+  - Projectile
+  - Enemy
+  - Item
+  - EnemyProjectile
   - 
   - 
   - 

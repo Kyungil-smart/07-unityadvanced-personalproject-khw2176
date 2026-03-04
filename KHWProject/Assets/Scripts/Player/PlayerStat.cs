@@ -12,11 +12,19 @@ public class PlayerStat : MonoBehaviour, IDamageable
     [Tooltip("기본 공격력")]
     [SerializeField] private float baseDamage = 2.5f;
 
+    [SerializeField] private GameObject explosionPrefab;
+
     public float CurrentHP { get; private set; }
     public float CurrentDamage { get; private set; }
 
-    public event Action OnDeath;
     public event Action OnStatChanged;
+    public event Action OnDeath;
+
+    public void ResetStat()
+    {
+        CurrentHP = maxHP;
+        CurrentDamage = baseDamage;
+    }
 
     private void Awake()
     {
@@ -32,34 +40,36 @@ public class PlayerStat : MonoBehaviour, IDamageable
     public void TakeDamage(float damage)
     {
         CurrentHP -= damage;
+        CurrentHP = Mathf.Max(CurrentHP, 0);
+
         OnStatChanged?.Invoke();
 
         if (CurrentHP <= 0)
         {
-            OnDeath?.Invoke();
-            Destroy(gameObject);
+            Die();
         }
     }
 
-    public void AddDamage(float value)
+    public void AddDamage(float amount)
     {
-        CurrentDamage += value;
+        CurrentDamage += amount;
         OnStatChanged?.Invoke();
     }
 
-    public void Heal(float value)
+    public void Heal(float amount)
     {
-        CurrentHP += value;
-        if (CurrentHP > maxHP)
-            CurrentHP = maxHP;
+        CurrentHP += amount;
+        CurrentHP = Mathf.Min(CurrentHP, maxHP);
 
         OnStatChanged?.Invoke();
     }
 
-    public void ResetStat()
+    void Die()
     {
-        CurrentHP = maxHP;
-        CurrentDamage = baseDamage;
-        OnStatChanged?.Invoke();
+        // 💥 폭발 이펙트 생성
+        if (explosionPrefab != null)
+            Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+
+        Destroy(gameObject, 0.1f);
     }
 }
