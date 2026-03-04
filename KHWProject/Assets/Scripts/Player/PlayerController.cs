@@ -58,6 +58,7 @@ public class PlayerController : MonoBehaviour
     void OnMove(InputAction.CallbackContext ctx)
     {
         moveInput = ctx.ReadValue<Vector2>();
+        Debug.Log($"moveInput = {moveInput}, phase = {ctx.phase}");
     }
 
     void Move()
