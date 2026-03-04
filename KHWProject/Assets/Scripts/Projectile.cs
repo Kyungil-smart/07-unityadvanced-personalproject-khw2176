@@ -2,29 +2,28 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    float damage;
+    [SerializeField] private float speed = 15f;
+    [SerializeField] private float lifeTime = 3f;
 
-    [SerializeField] float lifeTime = 3f;
+    private float damage;
 
-    public void SetDamage(float value)
+    private void Start()
     {
-        damage = value;
-    }
-
-    void Start()
-    {
+        damage = PlayerStat.Instance.CurrentDamage;
         Destroy(gameObject, lifeTime);
     }
 
-    void OnTriggerEnter(Collider other)
+    private void Update()
     {
-        IDamageable target = other.GetComponent<IDamageable>();
+        transform.Translate(Vector3.forward * speed * Time.deltaTime);
+    }
 
-        if (target != null)
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.TryGetComponent<IDamageable>(out IDamageable target))
         {
             target.TakeDamage(damage);
+            Destroy(gameObject);
         }
-
-        Destroy(gameObject);
     }
 }

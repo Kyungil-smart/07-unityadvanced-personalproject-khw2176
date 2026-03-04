@@ -1,132 +1,91 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerController : MonoBehaviour, IDamageable
+public class PlayerController : MonoBehaviour
 {
     [Header("이동 설정")]
-    [Tooltip("플레이어 이동 속도")]
-    [SerializeField] float moveSpeed = 5f;
+    [Tooltip("이동 속도")]
+    [SerializeField] private float moveSpeed = 5f;
 
-    [Tooltip("플레이어 회전 속도")]
-    [SerializeField] float rotateSpeed = 180f;
+    [Tooltip("회전 속도")]
+    [SerializeField] private float rotateSpeed = 180f;
 
-    [Header("전투 설정")]
-    [Tooltip("기본 공격력")]
-    [SerializeField] float baseDamage = 2.5f;
+    [Header("포신 설정")]
+    [SerializeField] private Transform turret;
+    [SerializeField] private GameObject projectilePrefab;
+    [SerializeField] private Transform firePoint;
 
-    [Tooltip("투사체 프리팹")]
-    [SerializeField] GameObject projectilePrefab;
+    private Rigidbody rb;
+    private TankInput input;
+    private Vector2 moveInput;
 
-    [Tooltip("발사 위치")]
-    [SerializeField] Transform firePoint;
+    public event Action OnFire;
 
-    [Tooltip("발사 힘")]
-    [SerializeField] float fireForce = 20f;
-
-    [Header("체력 설정")]
-    [Tooltip("기본 체력")]
-    [SerializeField] float maxHP = 12f;
-
-    [Tooltip("사망 이펙트")]
-    [SerializeField] GameObject deathEffect;
-
-    float currentHP;
-    Vector2 moveInput;
-    Rigidbody rb;
-    Camera mainCam;
-
-    public float CurrentHP => currentHP;
-    public float CurrentDamage => baseDamage;
-
-    void Awake()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        mainCam = Camera.main;
-        currentHP = maxHP;
+        input = new TankInput();
     }
 
-    void FixedUpdate()
+    private void OnEnable()
+    {
+        input.Player.Enable();
+        input.Player.Move.performed += OnMove;
+        input.Player.Move.canceled += OnMove;
+        input.Player.Fire.performed += Fire;
+    }
+
+    private void OnDisable()
+    {
+        input.Player.Move.performed -= OnMove;
+        input.Player.Move.canceled -= OnMove;
+        input.Player.Fire.performed -= Fire;
+        input.Player.Disable();
+    }
+
+    private void Update()
+    {
+        RotateTurret();
+    }
+
+    private void FixedUpdate()
     {
         Move();
     }
 
-    void Update()
+    void OnMove(InputAction.CallbackContext ctx)
     {
-        RotateTurretToMouse();
+        moveInput = ctx.ReadValue<Vector2>();
     }
 
     void Move()
     {
-        Vector3 moveDir = new Vector3(moveInput.x, 0, moveInput.y);
+        Vector3 dir = new Vector3(moveInput.x, 0, moveInput.y);
+        rb.MovePosition(transform.position + dir * moveSpeed * Time.fixedDeltaTime);
 
-        if (moveDir.magnitude < 0.1f) return;
-
-        // 방향 회전
-        Quaternion targetRot = Quaternion.LookRotation(moveDir);
-        rb.rotation = Quaternion.RotateTowards(
-            rb.rotation,
-            targetRot,
-            rotateSpeed * Time.fixedDeltaTime
-        );
-
-        // 앞으로 전진
-        Vector3 forwardMove = transform.forward * moveDir.magnitude;
-
-        rb.MovePosition(
-            rb.position + forwardMove * moveSpeed * Time.fixedDeltaTime
-        );
+        if (dir != Vector3.zero)
+        {
+            Quaternion rot = Quaternion.LookRotation(dir);
+            rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, rot, rotateSpeed * Time.fixedDeltaTime));
+        }
     }
 
-    void RotateTurretToMouse()
+    void RotateTurret()
     {
-        Ray ray = mainCam.ScreenPointToRay(Mouse.current.position.ReadValue());
-
-        if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            Vector3 lookDir = hit.point - firePoint.parent.position;
+            Vector3 lookDir = hit.point - turret.position;
             lookDir.y = 0;
-
-            firePoint.parent.rotation = Quaternion.LookRotation(lookDir);
+            turret.rotation = Quaternion.LookRotation(lookDir);
         }
     }
 
-    public void OnMove(InputAction.CallbackContext context)
+    void Fire(InputAction.CallbackContext context)
     {
-        moveInput = context.ReadValue<Vector2>();
-        Debug.Log("Move Input: " + moveInput);
-    }
-
-    public void OnFire(InputAction.CallbackContext context)
-    {
-        if (!context.performed) return;
-
-        Shoot();
-    }
-
-    void Shoot()
-    {
-        GameObject bullet = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
-
-        Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
-        bulletRb.AddForce(firePoint.forward * fireForce, ForceMode.Impulse);
-
-        bullet.GetComponent<Projectile>().SetDamage(baseDamage);
-    }
-
-    public void TakeDamage(float damage)
-    {
-        currentHP -= damage;
-
-        if (currentHP <= 0)
-        {
-            Die();
-        }
-    }
-
-    void Die()
-    {
-        Instantiate(deathEffect, transform.position, Quaternion.identity);
-        Destroy(gameObject);
+        Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
+        OnFire?.Invoke();
     }
 }
