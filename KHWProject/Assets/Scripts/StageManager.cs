@@ -17,29 +17,9 @@ public class StageManager : MonoBehaviour
         Instance = this;
     }
 
-    public void SetupStage()
+    private void Update()
     {
-        if (stageIndex == 1)
-        {
-            enemyCount = 5;
-            damageItemRemain = 3;
-            healItemRemain = 2;
-            limitTime = 300;
-        }
-        else if (stageIndex == 2)
-        {
-            enemyCount = 7;
-            damageItemRemain = 4;
-            healItemRemain = 3;
-            limitTime = 360;
-        }
-        else
-        {
-            enemyCount = 9;
-            damageItemRemain = 4;
-            healItemRemain = 4;
-            limitTime = 420;
-        }
+        
     }
 
     public void EnemyKilled(Vector3 pos)

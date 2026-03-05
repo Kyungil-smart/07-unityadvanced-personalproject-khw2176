@@ -2,13 +2,15 @@ using UnityEngine;
 
 public class EnemyProjectile : MonoBehaviour
 {
-    [SerializeField] float speed = 15f;
-    float damage;
+    [SerializeField] private float speed = 10f;
+    [SerializeField] private float lifeTime = 3f;
 
-    public void Init(float dmg)
+    private float damage;
+
+    void Start()
     {
-        damage = dmg;
-        Destroy(gameObject, 3f);
+        damage = GetComponentInParent<EnemyStat>()?.Damage ?? 1f;
+        Destroy(gameObject, lifeTime);
     }
 
     void Update()
@@ -23,13 +25,10 @@ public class EnemyProjectile : MonoBehaviour
             other.GetComponent<IDamageable>()?.TakeDamage(damage);
             Destroy(gameObject);
         }
-        else if (other.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
+
+        if (other.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
         {
             Destroy(gameObject);
-        }
-        else if (other.gameObject.layer == LayerMask.NameToLayer("Enemy"))
-        {
-            Destroy(gameObject); // 데미지 X
         }
     }
 }
