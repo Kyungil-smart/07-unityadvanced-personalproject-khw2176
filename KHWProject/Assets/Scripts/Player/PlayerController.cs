@@ -6,16 +6,16 @@ using System;
 public class PlayerController : MonoBehaviour
 {
     [Header("이동 설정")]
-    [Tooltip("이동 속도")]
     [SerializeField] private float moveSpeed = 5f;
-
-    [Tooltip("회전 속도")]
     [SerializeField] private float rotateSpeed = 180f;
 
     [Header("포신 설정")]
     [SerializeField] private Transform turret;
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private Transform firePoint;
+
+    [SerializeField] private float fireCooldown = 0.4f;
+    private float lastFireTime;
 
     private Rigidbody rb;
     private TankInput input;
@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        rb.freezeRotation = true;  // 물리 회전 고정
         input = new TankInput();
     }
 
@@ -58,18 +59,43 @@ public class PlayerController : MonoBehaviour
     void OnMove(InputAction.CallbackContext ctx)
     {
         moveInput = ctx.ReadValue<Vector2>();
-        Debug.Log($"moveInput = {moveInput}, phase = {ctx.phase}");
     }
 
     void Move()
     {
+        // 이동 방향
         Vector3 dir = new Vector3(moveInput.x, 0, moveInput.y);
-        rb.MovePosition(transform.position + dir * moveSpeed * Time.fixedDeltaTime);
+        if (dir.sqrMagnitude < 0.01f) return;
 
-        if (dir != Vector3.zero)
+        dir.Normalize();
+
+        // 장애물 체크: 플레이어가 밀리지 않도록 Raycast 두 개
+        float checkDistance = moveSpeed * Time.fixedDeltaTime + 0.2f;
+        Vector3 origin = rb.position + Vector3.up * 0.5f;
+
+        // 중앙과 양쪽 레이 체크
+        bool blocked = false;
+        Vector3[] offsets = { Vector3.zero, transform.right * 0.4f, -transform.right * 0.4f };
+        foreach (var offset in offsets)
         {
-            Quaternion rot = Quaternion.LookRotation(dir);
-            rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, rot, rotateSpeed * Time.fixedDeltaTime));
+            if (Physics.Raycast(origin + offset, dir, out RaycastHit hit, checkDistance))
+            {
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
+                {
+                    blocked = true;
+                    break;
+                }
+            }
+        }
+
+        if (!blocked)
+        {
+            Vector3 newPos = rb.position + dir * moveSpeed * Time.fixedDeltaTime;
+            rb.MovePosition(newPos);
+
+            // 회전
+            Quaternion targetRot = Quaternion.LookRotation(dir);
+            rb.MoveRotation(Quaternion.RotateTowards(rb.rotation, targetRot, rotateSpeed * Time.fixedDeltaTime));
         }
     }
 
@@ -86,6 +112,10 @@ public class PlayerController : MonoBehaviour
 
     void Fire(InputAction.CallbackContext context)
     {
+        if (Time.time < lastFireTime + fireCooldown) return;
+
+        lastFireTime = Time.time;
+
         Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
         OnFire?.Invoke();
     }

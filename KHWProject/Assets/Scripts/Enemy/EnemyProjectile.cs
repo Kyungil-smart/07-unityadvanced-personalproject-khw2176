@@ -2,28 +2,45 @@ using UnityEngine;
 
 public class EnemyProjectile : MonoBehaviour
 {
-    [SerializeField] private float speed = 10f;
-    [SerializeField] private float lifeTime = 3f;
+    [SerializeField] float speed = 10f;
+    [SerializeField] float lifeTime = 3f;
 
-    private float damage;
+    float damage;
+    GameObject owner;   // 🔥 발사한 Enemy
+
+    public void SetDamage(float dmg)
+    {
+        damage = dmg;
+    }
+
+    public void SetOwner(GameObject obj)
+    {
+        owner = obj;
+    }
 
     void Start()
     {
-        damage = GetComponentInParent<EnemyStat>()?.Damage ?? 1f;
         Destroy(gameObject, lifeTime);
     }
 
     void Update()
     {
-        transform.Translate(Vector3.forward * speed * Time.deltaTime);
+        transform.position += transform.forward * speed * Time.deltaTime;
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        GameObject hitRoot = other.transform.root.gameObject;
+
+        if (hitRoot == owner) // 자기 자신이면 무시
+            return;
+
+        IDamageable target = other.GetComponentInParent<IDamageable>();
+        if (target != null)
         {
-            other.GetComponent<IDamageable>()?.TakeDamage(damage);
+            target.TakeDamage(damage);
             Destroy(gameObject);
+            return;
         }
 
         if (other.gameObject.layer == LayerMask.NameToLayer("Obstacle"))

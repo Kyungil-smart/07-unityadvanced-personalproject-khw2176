@@ -66,10 +66,11 @@ public class PlayerStat : MonoBehaviour, IDamageable
 
     void Die()
     {
-        // 💥 폭발 이펙트 생성
         if (explosionPrefab != null)
+        {
             Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+        }
 
-        Destroy(gameObject, 0.1f);
+        Destroy(gameObject);
     }
 }

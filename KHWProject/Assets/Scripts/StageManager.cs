@@ -1,54 +1,31 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class StageManager : MonoBehaviour
 {
-    public static StageManager Instance;
+    [Header("적 관리")]
+    [SerializeField] private List<GameObject> enemyPrefabs;
+    [SerializeField] private Transform[] spawnPoints;
 
-    [SerializeField] int stageIndex;
-    [SerializeField] float limitTime;
+    public int stage = 1;
 
-    int enemyCount;
-    int damageItemRemain;
-    int healItemRemain;
+    private List<GameObject> spawnedEnemies = new List<GameObject>();
 
-    void Awake()
+    public void StartStage(int stageNum)
     {
-        Instance = this;
+        stage = stageNum;
+        SpawnEnemies();
     }
 
-    private void Update()
+    void SpawnEnemies()
     {
-        
-    }
-
-    public void EnemyKilled(Vector3 pos)
-    {
-        enemyCount--;
-
-        if (ItemFactory.Instance != null)
+        foreach (var spawn in spawnPoints)
         {
-            if (Random.value > 0.5f && damageItemRemain > 0)
-            {
-                ItemFactory.Instance.SpawnDamage(pos);
-                damageItemRemain--;
-            }
-            else if (healItemRemain > 0)
-            {
-                ItemFactory.Instance.SpawnHeal(pos);
-                healItemRemain--;
-            }
+            int index = Random.Range(0, enemyPrefabs.Count);
+            GameObject enemy = Instantiate(enemyPrefabs[index], spawn.position, spawn.rotation);
+            spawnedEnemies.Add(enemy);
         }
-
-        if (enemyCount <= 0)
-            NextStage();
     }
 
-    void NextStage()
-    {
-        if (stageIndex == 3)
-            SceneManager.LoadScene("ClearScene");
-        else
-            SceneManager.LoadScene("Stage" + (stageIndex + 1));
-    }
+    // 게임 시작 시 아이템 생성 코드 제거!
 }
