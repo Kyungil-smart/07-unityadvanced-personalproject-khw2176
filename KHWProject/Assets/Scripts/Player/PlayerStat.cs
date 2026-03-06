@@ -71,6 +71,8 @@ public class PlayerStat : MonoBehaviour, IDamageable
             Instantiate(explosionPrefab, transform.position, Quaternion.identity);
         }
 
+        GameManager.Instance.GameOver();
+
         Destroy(gameObject);
     }
 }

@@ -6,6 +6,7 @@ public class StageManager : MonoBehaviour
     [Header("적 관리")]
     [SerializeField] private List<GameObject> enemyPrefabs;
     [SerializeField] private Transform[] spawnPoints;
+    [SerializeField] int enemyCount = 5;
 
     public int stage = 1;
 
@@ -19,10 +20,14 @@ public class StageManager : MonoBehaviour
 
     void SpawnEnemies()
     {
-        foreach (var spawn in spawnPoints)
+        for (int i = 0; i < enemyCount; i++)
         {
+            Transform spawn = spawnPoints[Random.Range(0, spawnPoints.Length)];
+
             int index = Random.Range(0, enemyPrefabs.Count);
+
             GameObject enemy = Instantiate(enemyPrefabs[index], spawn.position, spawn.rotation);
+
             spawnedEnemies.Add(enemy);
         }
     }

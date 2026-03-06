@@ -12,6 +12,7 @@ public class EnemyStat : MonoBehaviour, IDamageable
     [SerializeField] float healAmount = 4f;
     [SerializeField] float attackAmount = 0.5f;
 
+
     public float CurrentHP { get; private set; }
     public float MaxHP { get; private set; }
     public float Damage { get; private set; }
@@ -47,6 +48,8 @@ public class EnemyStat : MonoBehaviour, IDamageable
         }
 
         SpawnItem();
+
+        GameManager.Instance.EnemyKilled();
 
         Destroy(gameObject);
     }
