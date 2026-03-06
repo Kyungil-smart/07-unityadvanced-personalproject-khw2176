@@ -1,1 +1,11 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=22871652&assignment_repo_type=AssignmentRepo)
+1. 참고 게임: tank hero
+2. 조작 방법: w, s, a, d로 상하좌우 이동
+3. 마우스 좌클릭 투사체 발사
+4. 플레이어 탱크 터렛이 마우스 위치에 따라 변경, 장애물 오브젝트 통과 못함
+5. CSV로 Stage, 제한 시간, 적 탱크(HP, Attack)를 관리
+6. 적 탱크는 Nav Mesh를 통해 장애물 통과 못하고 플레이어를 감지시 추적해서 투사체 발사
+7. 스테이지 1: AI 적 탱크는 5대로 각각 체력 3, 공격력 2 -> 적 탱크 죽으면 공격력 업글 아이템 2개, 체력 회복 아이템 3개 랜덤으로 떨굼
+8. 적과 플레이어 죽으며 이펙트 효과 부과
+9. 플레이어가 아이템 먹으면 사라지고 왼쪽 하단 UI HP, Attack 값이 변경
+10. 플레이어가 적을 모두 제거하면 Game Clear 화면이 나옴
+11. 플레이어가 죽으면 Game Over 화면이 나옴
